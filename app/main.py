@@ -15,6 +15,7 @@ from app.services.llm_reviewer import review_resume
 from app.services.interview_question_generator import (
     generate_interview_questions
 )
+from app.services.resume_rewriter import rewrite_resume
 
 app = FastAPI()
 
@@ -158,3 +159,19 @@ async def interview_questions(
         resume_text,
         job_description
     )
+
+@app.post("/improve-resume")
+async def improve_resume(
+    file: UploadFile = File(...)
+):
+
+    file_path = f"uploads/{file.filename}"
+
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+
+    resume_text = extract_resume_text(file_path)
+
+    result = rewrite_resume(resume_text)
+
+    return result
