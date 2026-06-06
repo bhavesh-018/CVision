@@ -1,5 +1,16 @@
 from app.services.skills import extract_skills
 
+CRITICAL_SKILLS = {
+    "aws",
+    "docker",
+    "kubernetes",
+    "redis",
+    "postgresql",
+    "system design",
+    "microservices",
+    "terraform",
+    "ci/cd"
+}
 
 def match_job_description(
     resume_text: str,
@@ -26,6 +37,12 @@ def match_job_description(
         )
     )
 
+    critical_missing_skills = [
+        skill
+        for skill in missing_skills
+        if skill.lower() in CRITICAL_SKILLS
+    ]
+
     if len(jd_skills) == 0:
         match_score = 0
     else:
@@ -36,9 +53,18 @@ def match_job_description(
 
     recommendations = []
 
-    if missing_skills:
+    if critical_missing_skills:
+
         recommendations.append(
-            f"Consider adding experience with: {', '.join(missing_skills)}"
+            "Focus on learning these high-impact skills: "
+            + ", ".join(critical_missing_skills)
+        )
+
+    elif missing_skills:
+
+        recommendations.append(
+            "Consider gaining experience with: "
+            + ", ".join(missing_skills)
         )
 
     if match_score >= 80:
@@ -60,5 +86,6 @@ def match_job_description(
         "match_score": match_score,
         "matching_skills": matching_skills,
         "missing_skills": missing_skills,
+        "critical_missing_skills": critical_missing_skills,
         "recommendations": recommendations
     }

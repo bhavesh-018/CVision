@@ -12,6 +12,9 @@ from app.services.semantic_matcher import (
 )
 from app.services.section_analyzer import analyze_sections
 from app.services.llm_reviewer import review_resume
+from app.services.interview_question_generator import (
+    generate_interview_questions
+)
 
 app = FastAPI()
 
@@ -137,3 +140,21 @@ async def ai_review(
         return {
             "error": str(e)
         }
+
+@app.post("/interview-questions")
+async def interview_questions(
+    file: UploadFile = File(...),
+    job_description: str = Form("")
+):
+
+    file_path = f"uploads/{file.filename}"
+
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+
+    resume_text = extract_resume_text(file_path)
+
+    return generate_interview_questions(
+        resume_text,
+        job_description
+    )
