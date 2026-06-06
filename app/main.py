@@ -12,10 +12,9 @@ from app.services.semantic_matcher import (
 )
 from app.services.section_analyzer import analyze_sections
 from app.services.llm_reviewer import review_resume
-from app.services.interview_question_generator import (
-    generate_interview_questions
-)
+from app.services.interview_question_generator import generate_interview_questions
 from app.services.resume_rewriter import rewrite_resume
+from app.services.role_readiness import calculate_role_readiness
 
 app = FastAPI()
 
@@ -175,3 +174,21 @@ async def improve_resume(
     result = rewrite_resume(resume_text)
 
     return result
+
+@app.post("/role-readiness")
+async def role_readiness(
+    file: UploadFile = File(...),
+    role: str = Form(...)
+):
+
+    file_path = f"uploads/{file.filename}"
+
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+
+    resume_text = extract_resume_text(file_path)
+
+    return calculate_role_readiness(
+        resume_text,
+        role
+    )
