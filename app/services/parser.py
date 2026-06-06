@@ -1,8 +1,11 @@
 from pypdf import PdfReader
 
-def extract_resume_text(file_path: str):
 
-    reader = PdfReader(file_path)
+def extract_resume_text(file):
+
+    file.file.seek(0)
+
+    reader = PdfReader(file.file)
 
     text = ""
 

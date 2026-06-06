@@ -6,6 +6,9 @@ from app.services.skills import extract_skills
 from app.services.ats import calculate_ats_score
 from app.services.evaluator import evaluate_resume
 from app.services.jd_matcher import match_job_description
+from app.services.semantic_matcher import (
+    calculate_semantic_similarity, get_match_level
+)
 
 app = FastAPI()
 
@@ -70,3 +73,29 @@ def health():
     return {
         "status": "healthy"
     }
+
+@app.post("/semantic-match")
+async def semantic_match(
+    file: UploadFile = File(...),
+    job_description: str = Form(...)
+):
+    try:
+        resume_text = extract_resume_text(file)
+
+        similarity_score = calculate_semantic_similarity(
+            resume_text,
+            job_description
+        )
+
+        match_level = get_match_level(similarity_score)
+
+        return {
+            "semantic_match_score": similarity_score,
+            "match_level": match_level,
+            "message": "Semantic matching completed"
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
