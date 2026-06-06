@@ -15,6 +15,7 @@ from app.services.llm_reviewer import review_resume
 from app.services.interview_question_generator import generate_interview_questions
 from app.services.resume_rewriter import rewrite_resume
 from app.services.role_readiness import calculate_role_readiness
+from app.services.benchmark import benchmark_resume
 
 app = FastAPI()
 
@@ -191,4 +192,33 @@ async def role_readiness(
     return calculate_role_readiness(
         resume_text,
         role
+    )
+
+@app.post("/resume-benchmark")
+async def resume_benchmark(
+    file: UploadFile = File(...)
+):
+
+    file_path = f"uploads/{file.filename}"
+
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+
+    resume_text = extract_resume_text(file_path)
+
+    skills = extract_skills(resume_text)
+
+    sections_data = analyze_sections(
+        resume_text
+    )
+
+    ats_data = calculate_ats_score(
+        resume_text,
+        skills
+    )
+
+    return benchmark_resume(
+        ats_score=ats_data["score"],
+        skills_count=len(skills),
+        sections=sections_data["sections"]
     )
