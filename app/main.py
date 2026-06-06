@@ -1,6 +1,7 @@
 from fastapi import Form
 from fastapi import FastAPI, UploadFile, File
-
+from dotenv import load_dotenv
+load_dotenv()
 from app.services.parser import extract_resume_text
 from app.services.skills import extract_skills
 from app.services.ats import calculate_ats_score
@@ -10,6 +11,7 @@ from app.services.semantic_matcher import (
     calculate_semantic_similarity, get_match_level
 )
 from app.services.section_analyzer import analyze_sections
+from app.services.llm_reviewer import review_resume
 
 app = FastAPI()
 
@@ -119,3 +121,19 @@ async def analyze_resume_sections(
             "error": str(e)
         }
 
+@app.post("/ai-review")
+async def ai_review(
+    file: UploadFile = File(...)
+):
+    try:
+
+        resume_text = extract_resume_text(file)
+
+        result = review_resume(resume_text)
+
+        return result
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
