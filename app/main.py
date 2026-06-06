@@ -9,6 +9,7 @@ from app.services.jd_matcher import match_job_description
 from app.services.semantic_matcher import (
     calculate_semantic_similarity, get_match_level
 )
+from app.services.section_analyzer import analyze_sections
 
 app = FastAPI()
 
@@ -99,3 +100,22 @@ async def semantic_match(
         return {
             "error": str(e)
         }
+    
+@app.post("/analyze-sections")
+async def analyze_resume_sections(
+    file: UploadFile = File(...)
+):
+
+    try:
+
+        resume_text = extract_resume_text(file)
+
+        result = analyze_sections(resume_text)
+
+        return result
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
+
