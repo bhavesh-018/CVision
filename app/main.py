@@ -1,5 +1,6 @@
 from fastapi import Form
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 load_dotenv()
 from app.services.parser import extract_resume_text
@@ -18,6 +19,15 @@ from app.services.role_readiness import calculate_role_readiness
 from app.services.benchmark import benchmark_resume
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():
