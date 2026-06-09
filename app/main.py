@@ -232,3 +232,115 @@ async def resume_benchmark(
         skills_count=len(skills),
         sections=sections_data["sections"]
     )
+
+@app.post("/dashboard")
+async def dashboard(
+    file: UploadFile = File(...)
+):
+    try:
+
+        # Save uploaded file
+
+        file_path = f"uploads/{file.filename}"
+
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
+
+        # Parse resume
+
+        resume_text = extract_resume_text(file_path)
+
+        # Extract skills
+
+        skills = extract_skills(
+            resume_text
+        )
+
+        # ATS Analysis
+
+        ats = calculate_ats_score(
+            resume_text,
+            skills
+        )
+
+        # Resume Evaluation
+
+        evaluation = evaluate_resume(
+            resume_text,
+            skills
+        )
+
+        # AI Review
+
+        review = review_resume(
+            resume_text
+        )
+
+        # Interview Questions
+
+        interview = generate_interview_questions(
+            resume_text,
+            ""
+        )
+
+        # Section Analysis
+
+        sections = analyze_sections(
+            resume_text
+        )
+
+        # Resume Benchmark
+
+        benchmark = benchmark_resume(
+            ats_score=ats["score"],
+            skills_count=len(skills),
+            sections=sections["sections"]
+        )
+
+        # Role Readiness
+
+        readiness = calculate_role_readiness(
+            resume_text,
+            "Backend Engineer"
+        )
+
+        # Resume Rewriting
+
+        rewrite = rewrite_resume(
+            resume_text
+        )
+
+        return {
+
+            "filename": file.filename,
+
+            "skills": skills,
+
+            "ats": {
+                "score": ats["score"],
+                "breakdown": ats["breakdown"]
+            },
+
+            "evaluation": {
+                "strengths": evaluation["strengths"],
+                "weaknesses": evaluation["weaknesses"],
+                "suggestions": evaluation["suggestions"]
+            },
+
+            "review": review,
+
+            "interview": interview,
+
+            "benchmark": benchmark,
+
+            "readiness": readiness,
+
+            "rewrite": rewrite
+        }
+
+    except Exception as e:
+
+        return {
+            "success": False,
+            "error": str(e)
+        }

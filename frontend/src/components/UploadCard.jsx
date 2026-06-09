@@ -40,7 +40,7 @@ function UploadCard() {
       formData.append("file", file);
 
       const response = await api.post(
-        "/analyze",
+        "/dashboard",
         formData,
         {
           headers: {

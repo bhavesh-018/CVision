@@ -62,8 +62,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <Navbar />
-
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent pointer-events-none" />

@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
-import {
-  Award,
-  Brain,
-  FileSearch,
-  AlertTriangle,
-  CheckCircle,
-} from "lucide-react";
+
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+import OverviewSection from "../components/dashboard/OverviewSection";
+import TabNavigation from "../components/dashboard/TabNavigation";
+
+import AtsTab from "../components/dashboard/AtsTab";
+import ReviewTab from "../components/dashboard/ReviewTab";
+import BenchmarkTab from "../components/dashboard/BenchmarkTab";
+import ReadinessTab from "../components/dashboard/ReadinessTab";
+import InterviewTab from "../components/dashboard/InterviewTab";
+import RewriteTab from "../components/dashboard/RewriteTab";
 
 function Dashboard() {
   const [analysis, setAnalysis] = useState(null);
+  const [activeTab, setActiveTab] = useState("ats");
 
   useEffect(() => {
     const storedData = localStorage.getItem("analysis");
@@ -22,13 +27,15 @@ function Dashboard() {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-3xl font-bold">
+
+          <h2 className="text-4xl font-bold">
             No Resume Analysis Found
           </h2>
 
           <p className="mt-4 text-slate-400">
-            Upload a resume first.
+            Upload a resume first to view your dashboard.
           </p>
+
         </div>
       </div>
     );
@@ -44,186 +51,102 @@ function Dashboard() {
     analysis.skills || [];
 
   const strengths =
-    analysis.strengths || [];
+    analysis.evaluation?.strengths || [];
 
   const weaknesses =
-    analysis.weaknesses || [];
+    analysis.evaluation?.weaknesses || [];
 
-  const suggestions =
-    analysis.suggestions || [];
+  const benchmark =
+    analysis.benchmark || {};
+
+  const readiness =
+    analysis.readiness || {};
+
+  const tabs = [
+    {
+      id: "ats",
+      label: "ATS Analysis",
+    },
+    {
+      id: "review",
+      label: "AI Review",
+    },
+    {
+      id: "benchmark",
+      label: "Benchmark",
+    },
+    {
+      id: "readiness",
+      label: "Readiness",
+    },
+    {
+      id: "interview",
+      label: "Interview",
+    },
+    {
+      id: "rewrite",
+      label: "Rewrite",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <div className="max-w-7xl mx-auto px-6 py-12">
 
-        {/* Header */}
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
-        <div className="mb-10">
-          <h1 className="text-5xl font-bold">
-            Resume Dashboard
-          </h1>
+        <DashboardHeader
+          filename={analysis.filename}
+        />
 
-          <p className="text-slate-400 mt-3">
-            Your AI-powered resume analysis results.
-          </p>
-        </div>
+        <OverviewSection
+          atsScore={atsScore}
+          benchmark={benchmark}
+          readiness={readiness}
+          skills={skills}
+          strengths={strengths}
+          weaknesses={weaknesses}
+        />
 
-        {/* ATS Score */}
+        <div className="mt-10">
 
-        <div className="grid md:grid-cols-3 gap-6 mb-10">
-
-          <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-            <div className="flex items-center gap-3 mb-4">
-              <Award className="text-green-400" />
-              <h3 className="text-lg font-semibold">
-                ATS Score
-              </h3>
-            </div>
-
-            <h2 className="text-6xl font-bold text-green-400">
-              {atsScore}
-            </h2>
-
-          </div>
-
-          <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-            <div className="flex items-center gap-3 mb-4">
-              <FileSearch className="text-blue-400" />
-              <h3 className="text-lg font-semibold">
-                Skills Found
-              </h3>
-            </div>
-
-            <h2 className="text-6xl font-bold text-blue-400">
-              {skills.length}
-            </h2>
-
-          </div>
-
-          <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-            <div className="flex items-center gap-3 mb-4">
-              <Brain className="text-purple-400" />
-              <h3 className="text-lg font-semibold">
-                Resume Quality
-              </h3>
-            </div>
-
-            <h2 className="text-3xl font-bold text-purple-400">
-              {atsScore >= 80
-                ? "Excellent"
-                : atsScore >= 60
-                ? "Good"
-                : "Needs Work"}
-            </h2>
-
-          </div>
+          <TabNavigation
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
 
         </div>
 
-        {/* Skills */}
+        <div className="mt-8">
 
-        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8 mb-10">
+          {activeTab === "ats" && (
+            <AtsTab analysis={analysis} />
+          )}
 
-          <h2 className="text-2xl font-bold mb-6">
-            Skills Detected
-          </h2>
+          {activeTab === "review" && (
+            <ReviewTab analysis={analysis} />
+          )}
 
-          <div className="flex flex-wrap gap-3">
+          {activeTab === "benchmark" && (
+            <BenchmarkTab analysis={analysis} />
+          )}
 
-            {skills.map((skill, index) => (
-              <span
-                key={index}
-                className="rounded-full bg-blue-500/10 border border-blue-500/20 px-4 py-2 text-blue-400"
-              >
-                {skill}
-              </span>
-            ))}
+          {activeTab === "readiness" && (
+            <ReadinessTab analysis={analysis} />
+          )}
 
-          </div>
+          {activeTab === "interview" && (
+            <InterviewTab analysis={analysis} />
+          )}
 
-        </div>
-
-        {/* Strengths + Weaknesses */}
-
-        <div className="grid lg:grid-cols-2 gap-6 mb-10">
-
-          <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-            <div className="flex items-center gap-3 mb-6">
-              <CheckCircle className="text-green-400" />
-              <h2 className="text-2xl font-bold">
-                Strengths
-              </h2>
-            </div>
-
-            <ul className="space-y-4">
-
-              {strengths.map((item, index) => (
-                <li
-                  key={index}
-                  className="text-slate-300"
-                >
-                  • {item}
-                </li>
-              ))}
-
-            </ul>
-
-          </div>
-
-          <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-            <div className="flex items-center gap-3 mb-6">
-              <AlertTriangle className="text-yellow-400" />
-              <h2 className="text-2xl font-bold">
-                Weaknesses
-              </h2>
-            </div>
-
-            <ul className="space-y-4">
-
-              {weaknesses.map((item, index) => (
-                <li
-                  key={index}
-                  className="text-slate-300"
-                >
-                  • {item}
-                </li>
-              ))}
-
-            </ul>
-
-          </div>
-
-        </div>
-
-        {/* Suggestions */}
-
-        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-          <h2 className="text-2xl font-bold mb-6">
-            Suggestions
-          </h2>
-
-          <ul className="space-y-4">
-
-            {suggestions.map((item, index) => (
-              <li
-                key={index}
-                className="text-slate-300"
-              >
-                • {item}
-              </li>
-            ))}
-
-          </ul>
+          {activeTab === "rewrite" && (
+            <RewriteTab analysis={analysis} />
+          )}
 
         </div>
 
       </div>
+
     </div>
   );
 }
