@@ -1,11 +1,3 @@
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
 function AtsTab({ analysis }) {
   const breakdown =
     analysis.ats?.breakdown ||
