@@ -10,6 +10,8 @@ import BenchmarkTab from "../components/dashboard/BenchmarkTab";
 import ReadinessTab from "../components/dashboard/ReadinessTab";
 import InterviewTab from "../components/dashboard/InterviewTab";
 import RewriteTab from "../components/dashboard/RewriteTab";
+import Navbar from "../components/Navbar";
+
 
 function Dashboard() {
   const [analysis, setAnalysis] = useState(null);
@@ -25,7 +27,9 @@ function Dashboard() {
 
   if (!analysis) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 text-white flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
 
           <h2 className="text-4xl font-bold">
@@ -37,6 +41,7 @@ function Dashboard() {
           </p>
 
         </div>
+      </div>
       </div>
     );
   }
@@ -91,7 +96,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-
+      <Navbar />
       <div className="max-w-7xl mx-auto px-6 py-10">
 
         <DashboardHeader

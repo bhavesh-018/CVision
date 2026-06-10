@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Navbar from "../components/Navbar";
 import ChatWindow from "../components/chat/ChatWindow";
 
 export default function ChatPage() {
@@ -17,9 +18,9 @@ export default function ChatPage() {
   }, [sessionId]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+      <Navbar />
+      <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
 
         {/* Header */}
 
