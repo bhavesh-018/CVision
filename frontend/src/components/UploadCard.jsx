@@ -38,6 +38,13 @@ function UploadCard() {
       const formData = new FormData();
 
       formData.append("file", file);
+      
+      let sessionId = localStorage.getItem("session_id");
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem("session_id", sessionId);
+      }
+      formData.append("session_id", sessionId);
 
       const response = await api.post(
         "/dashboard",
@@ -52,6 +59,10 @@ function UploadCard() {
       localStorage.setItem(
         "analysis",
         JSON.stringify(response.data)
+      );
+      localStorage.setItem(
+        "filename",
+        file.name
       );
 
       navigate("/dashboard");

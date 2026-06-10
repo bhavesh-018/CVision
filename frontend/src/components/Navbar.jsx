@@ -1,4 +1,5 @@
 import { FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
@@ -22,17 +23,17 @@ function Navbar() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
-          <a href="#features" className="hover:text-white">
-            Features
-          </a>
+          <Link to="/" className="hover:text-white">
+            Home
+          </Link>
 
-          <a href="#upload" className="hover:text-white">
-            Upload
-          </a>
-
-          <a href="#dashboard" className="hover:text-white">
+          <Link to="/dashboard" className="hover:text-white">
             Dashboard
-          </a>
+          </Link>
+
+          <Link to="/chat" className="hover:text-white text-emerald-400 font-medium">
+            Resume Chat
+          </Link>
         </nav>
 
         <button className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-sm hover:border-blue-500">

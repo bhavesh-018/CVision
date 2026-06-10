@@ -3,16 +3,56 @@
   "Java",
   "C++",
   "JavaScript",
+  "TypeScript",
+  "HTML",
+  "CSS",
+
   "React",
+  "Next.js",
   "NodeJS",
+  "Express",
+
   "FastAPI",
   "Django",
+  "Laravel",
+  "Spring Boot",
+
   "MongoDB",
   "SQL",
+  "MySQL",
+  "PostgreSQL",
+  "Redis",
+
   "Docker",
-  "AWS",
-  "Git",
   "Kubernetes",
+  "AWS",
+  "Terraform",
+
+  "Git",
+  "GitHub",
+  "CI/CD",
+  "Jenkins",
+
+  "REST API",
+  "GraphQL",
+
+  "OOP",
+  "Data Structures",
+  "Algorithms",
+  "System Design",
+
   "Machine Learning",
-  "Deep Learning"
+  "Deep Learning",
+  "RAG",
+  "LLM",
+  "LangChain",
+  "Vector Database",
+
+  "Kafka",
+  "Airflow",
+  "Spark",
+
+  "Linux",
+  "Microservices",
+  "Design Patterns"
 ]

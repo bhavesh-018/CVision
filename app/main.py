@@ -17,8 +17,27 @@ from app.services.interview_question_generator import generate_interview_questio
 from app.services.resume_rewriter import rewrite_resume
 from app.services.role_readiness import calculate_role_readiness
 from app.services.benchmark import benchmark_resume
+from app.services.master_analysis import master_analysis
+from contextlib import asynccontextmanager
+from app.db.chroma_manager import ChromaManager
+from app.db.sqlite_manager import SQLiteManager
+from app.rag.knowledge.career_knowledge import load_career_knowledge
+from app.routers import chat
+from app.rag.ingestion.resume_ingester import ingest_resume
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize ChromaDB on startup
+    chroma_manager = ChromaManager()
+    chroma_manager.initialize()
+    # Load default knowledge base
+    load_career_knowledge()
+    # Initialize SQLite (creates tables if needed)
+    SQLiteManager()
+    yield
+    # Shutdown logic if any
+
+app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -28,6 +47,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(chat.router)
 
 @app.get("/")
 def home():
@@ -87,9 +108,20 @@ async def match_job(
 
 @app.get("/health")
 def health():
-    return {
-        "status": "healthy"
-    }
+    try:
+        chroma = ChromaManager()
+        sqlite = SQLiteManager()
+        return {
+            "status": "healthy",
+            "chroma_status": "initialized" if chroma._initialized else "uninitialized",
+            "chroma_collections": chroma.collection_stats() if chroma._initialized else {},
+            "sqlite_status": "connected"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e)
+        }
 
 @app.post("/semantic-match")
 async def semantic_match(
@@ -235,7 +267,8 @@ async def resume_benchmark(
 
 @app.post("/dashboard")
 async def dashboard(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    session_id: str = Form(None)
 ):
     try:
 
@@ -262,25 +295,21 @@ async def dashboard(
             resume_text,
             skills
         )
+        
+        # Ingest to ChromaDB for Chat/Coach
+        if session_id:
+            await ingest_resume(
+                resume_text=resume_text,
+                session_id=session_id,
+                filename=file.filename,
+                ats_score=ats["score"]
+            )
 
         # Resume Evaluation
 
         evaluation = evaluate_resume(
             resume_text,
             skills
-        )
-
-        # AI Review
-
-        review = review_resume(
-            resume_text
-        )
-
-        # Interview Questions
-
-        interview = generate_interview_questions(
-            resume_text,
-            ""
         )
 
         # Section Analysis
@@ -299,14 +328,64 @@ async def dashboard(
 
         # Role Readiness
 
-        readiness = calculate_role_readiness(
-            resume_text,
-            "Backend Engineer"
-        )
+        role_readiness = {
+            "Backend Engineer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Backend Engineer"
+                ),
+
+            "Full Stack Developer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Full Stack Developer"
+                ),
+
+            "Software Engineer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Software Engineer"
+                ),
+
+            "AI Engineer":
+                calculate_role_readiness(
+                    resume_text,
+                    "AI Engineer"
+                ),
+
+            "Devops Engineer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Devops Engineer"
+                ),
+            
+            "Data Engineer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Data Engineer"
+                ),
+            
+            "Java Developer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Java Developer"
+                ),
+
+            "Python Developer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Python Developer"
+                ),
+            "Frontend Developer":
+                calculate_role_readiness(
+                    resume_text,
+                    "Frontend Developer"
+                )
+        }
 
         # Resume Rewriting
 
-        rewrite = rewrite_resume(
+        ai_analysis = master_analysis(
             resume_text
         )
 
@@ -327,15 +406,21 @@ async def dashboard(
                 "suggestions": evaluation["suggestions"]
             },
 
-            "review": review,
+            "review": ai_analysis.get(
+                "review", {}
+            ),
 
-            "interview": interview,
+            "interview": ai_analysis.get(
+                "interview", {}
+            ),
 
             "benchmark": benchmark,
 
-            "readiness": readiness,
+            "readiness": role_readiness,
 
-            "rewrite": rewrite
+            "rewrite": ai_analysis.get(
+                "rewrite", {}
+            )
         }
 
     except Exception as e:

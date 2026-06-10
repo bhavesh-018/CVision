@@ -4,32 +4,35 @@ import {
   AlertTriangle,
   BookOpen,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+
 
 function ReadinessTab({ analysis }) {
-  const readiness =
-    analysis.readiness || {};
+  const [selectedRole, setSelectedRole] = useState(
+    analysis.readiness?.role || "Backend Engineer"
+  );
+
+  const readinessData =
+    analysis.readiness?.[selectedRole] || {};
 
   const readinessScore =
-    readiness.readiness_score || 0;
-
-  const role =
-    readiness.role || "Not Specified";
+    readinessData.readiness_score || 0;
 
   const readinessLevel =
-    readiness.readiness_level || "Unknown";
+    readinessData.readiness_level || "Unknown";
 
   const matchingSkills =
-    readiness.matching_skills || [];
+    readinessData.matching_skills || [];
 
   const missingSkills =
-    readiness.missing_skills || [];
+    readinessData.missing_skills || [];
 
   const strengths =
-    readiness.strengths || [];
+    readinessData.strengths || [];
 
   const roadmap =
-    readiness.roadmap || [];
-
+    readinessData.roadmap || [];
+  
   return (
     <div className="space-y-8">
 
@@ -69,19 +72,83 @@ function ReadinessTab({ analysis }) {
 
         <div className="rounded-3xl border border-purple-500/20 bg-purple-500/5 p-8">
 
-          <h3 className="text-lg text-slate-400">
-            Target Role
-          </h3>
+  <div className="flex items-center justify-between mb-6">
 
-          <h2 className="mt-3 text-4xl font-bold text-purple-400">
-            {role}
-          </h2>
+    <div>
+      <p className="text-sm text-slate-400 uppercase tracking-wider">
+        Target Role
+      </p>
 
-          <p className="mt-3 text-slate-400">
-            {readinessLevel}
-          </p>
+      <h3 className="mt-2 text-3xl font-bold text-purple-400">
+        {selectedRole}
+      </h3>
+    </div>
 
-        </div>
+    <div className="rounded-xl bg-purple-500/10 px-4 py-2 border border-purple-500/20">
+      <span className="text-purple-300">
+        {readinessLevel}
+      </span>
+    </div>
+
+  </div>
+
+  <div className="relative">
+  <select
+    value={selectedRole}
+    onChange={(e) =>
+      setSelectedRole(e.target.value)
+    }
+    className="
+      w-full
+      appearance-none
+      rounded-2xl
+      border
+      border-slate-700
+      bg-slate-900
+      px-5
+      py-4
+      pr-12
+      text-white
+      text-lg
+      outline-none
+      focus:border-purple-500
+    "
+  >
+    <option>Backend Engineer</option>
+    <option>Full Stack Developer</option>
+    <option>Frontend Developer</option>
+    <option>Software Engineer</option>
+    <option>AI Engineer</option>
+    <option>DevOps Engineer</option>
+    <option>Data Engineer</option>
+    <option>Java Developer</option>
+    <option>Python Developer</option>
+  </select>
+
+  <svg
+    className="
+      pointer-events-none
+      absolute
+      right-4
+      top-1/2
+      h-5
+      w-5
+      -translate-y-1/2
+      text-slate-400
+    "
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M19 9l-7 7-7-7"
+    />
+  </svg>
+</div>
+</div>
 
         <div className="rounded-3xl border border-green-500/20 bg-green-500/5 p-8">
 
