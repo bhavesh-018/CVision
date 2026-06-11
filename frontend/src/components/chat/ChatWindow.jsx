@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
+import toast from "react-hot-toast";
 
 export default function ChatWindow({ sessionId }) {
   const [messages, setMessages] = useState([]);
@@ -89,7 +90,10 @@ export default function ChatWindow({ sessionId }) {
         const { done, value } =
           await reader.read();
 
-        if (done) break;
+        if (done) {
+          toast.success("✅ Response ready!");
+          break;
+        }
 
         const chunk =
           decoder.decode(value, {
@@ -122,6 +126,7 @@ export default function ChatWindow({ sessionId }) {
       setError(
         "Failed to get response. Please try again."
       );
+      toast.error("Something went wrong. Please try again.");
 
       setIsTyping(false);
     }
@@ -144,7 +149,7 @@ export default function ChatWindow({ sessionId }) {
     };
 
   return (
-    <div className="flex h-full flex-col bg-slate-900">
+    <div className="flex h-full flex-col bg-[#1a1f35]">
 
       {/* Header */}
 
@@ -175,7 +180,7 @@ export default function ChatWindow({ sessionId }) {
 
       {/* Messages */}
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-hidden relative flex flex-col">
 
         <MessageList
           messages={messages}

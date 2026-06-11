@@ -24,17 +24,14 @@ export default function ChatPage() {
 
         {/* Header */}
 
-        <div className="mb-4">
+        <div className="mb-2 flex items-center justify-between">
 
-          <h1 className="text-3xl font-bold">
-            Resume Chat
-          </h1>
-
-          <p className="mt-3 max-w-2xl text-slate-400 text-md">
-            Ask questions about your resume,
-            career growth, skill gaps, ATS score,
-            interview preparation, and job readiness.
-          </p>
+          <div>
+            <h1 className="text-xl font-bold">Resume Chat</h1>
+            <p className="text-slate-400 text-sm">
+              Ask about your resume, skill gaps, ATS score, or interview prep.
+            </p>
+          </div>
 
         </div>
 
@@ -60,9 +57,7 @@ export default function ChatPage() {
 
           {/* Chat */}
 
-          <div
-            className="h-[75vh]"
-          >
+          <div className="flex-1 overflow-hidden relative flex flex-col">
             <ChatWindow
               sessionId={sessionId}
             />

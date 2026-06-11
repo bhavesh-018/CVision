@@ -7,7 +7,7 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 async def generate_rag_response(
     prompt: str,
     temperature: float = 0.7,
-    max_tokens: int = 2000
+    max_tokens: int = 8192
 ) -> str:
     """Generate response using Gemini with RAG context"""
     
@@ -28,7 +28,7 @@ async def generate_rag_response(
 async def generate_rag_response_stream(
     prompt: str,
     temperature: float = 0.7,
-    max_tokens: int = 2000
+    max_tokens: int = 8192
 ):
     """Stream response using Gemini with RAG context"""
     generation_config = {

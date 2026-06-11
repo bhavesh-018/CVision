@@ -1,4 +1,5 @@
 from app.db.chroma_manager import ChromaManager
+from app.db.sqlite_manager import SQLiteManager
 from datetime import datetime
 
 def split_by_sections(text: str, markers: dict) -> dict:
@@ -89,4 +90,12 @@ async def ingest_resume(
     
     if texts:
         ChromaManager().store("resumes", texts, metadatas, ids)
+    
+    # ✅ Update SQLite profile so Coach sidebar shows real ATS score + resume as Connected
+    db = SQLiteManager()
+    db.update_profile(
+        session_id=session_id,
+        ats_score=ats_score
+    )
+    
     return ids

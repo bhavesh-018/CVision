@@ -8,7 +8,7 @@ function Navbar() {
 
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-2">
-            <img src="../../public/logo.png" className="h-52 object-contain py-10" />
+            <img src="/logo.png" className="h-35 object-contain w-auto mt-2" />
           </Link>
         </div>
 
@@ -21,8 +21,12 @@ function Navbar() {
             Dashboard
           </Link>
 
-          <Link to="/chat" className="hover:text-white text-emerald-400 font-medium">
+          <Link to="/chat" className="hover:text-white">
             Resume Chat
+          </Link>
+
+          <Link to="/coach" className="hover:text-white text-blue-400 font-medium">
+            Career Coach
           </Link>
         </nav>
       </div>

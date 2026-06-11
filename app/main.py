@@ -23,6 +23,7 @@ from app.db.chroma_manager import ChromaManager
 from app.db.sqlite_manager import SQLiteManager
 from app.rag.knowledge.career_knowledge import load_career_knowledge
 from app.routers import chat
+from app.routers import coach
 from app.rag.ingestion.resume_ingester import ingest_resume
 
 @asynccontextmanager
@@ -41,7 +42,9 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -49,6 +52,7 @@ app.add_middleware(
 )
 
 app.include_router(chat.router)
+app.include_router(coach.router)
 
 @app.get("/")
 def home():

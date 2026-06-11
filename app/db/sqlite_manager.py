@@ -75,7 +75,7 @@ class SQLiteManager:
         if context:
             query += " AND context = ?"
             params.append(context)
-        query += " ORDER BY timestamp DESC LIMIT ?"
+        query += " ORDER BY timestamp DESC, id DESC LIMIT ?"
         params.append(limit)
         
         rows = self.conn.execute(query, params).fetchall()
