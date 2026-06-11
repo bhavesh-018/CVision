@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import ChatPage from "./pages/ChatPage";
 import CoachPage from "./pages/CoachPage";
 import GitHubPage from "./pages/GitHubPage";
+import JobsPage from "./pages/JobsPage";
 import "./App.css";
 
 function App() {
@@ -85,6 +86,11 @@ function App() {
         <Route
           path="/github"
           element={<GitHubPage />}
+        />
+
+        <Route
+          path="/jobs"
+          element={<JobsPage />}
         />
       </Routes>
     </BrowserRouter>

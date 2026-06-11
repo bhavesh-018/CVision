@@ -29,6 +29,10 @@ function Navbar() {
             GitHub
           </Link>
 
+          <Link to="/jobs" className="hover:text-white">
+            Jobs
+          </Link>
+
           <Link to="/coach" className="hover:text-white text-blue-400 font-medium">
             Career Coach
           </Link>
