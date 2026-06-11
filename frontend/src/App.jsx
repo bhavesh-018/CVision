@@ -7,6 +7,7 @@ import ChatPage from "./pages/ChatPage";
 import CoachPage from "./pages/CoachPage";
 import GitHubPage from "./pages/GitHubPage";
 import JobsPage from "./pages/JobsPage";
+import LinkedInPage from "./pages/LinkedInPage";
 import "./App.css";
 
 function App() {
@@ -91,6 +92,11 @@ function App() {
         <Route
           path="/jobs"
           element={<JobsPage />}
+        />
+
+        <Route
+          path="/linkedin"
+          element={<LinkedInPage />}
         />
       </Routes>
     </BrowserRouter>

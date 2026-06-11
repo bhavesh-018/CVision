@@ -26,6 +26,7 @@ from app.routers import chat
 from app.routers import coach
 from app.routers import github
 from app.routers import jobs
+from app.routers import linkedin
 from app.rag.ingestion.resume_ingester import ingest_resume
 
 @asynccontextmanager
@@ -57,6 +58,7 @@ app.include_router(chat.router)
 app.include_router(coach.router)
 app.include_router(github.router)
 app.include_router(jobs.router)
+app.include_router(linkedin.router)
 
 @app.get("/")
 def home():

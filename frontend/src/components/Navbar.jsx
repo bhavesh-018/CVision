@@ -33,6 +33,10 @@ function Navbar() {
             Jobs
           </Link>
 
+          <Link to="/linkedin" className="hover:text-white">
+            LinkedIn
+          </Link>
+
           <Link to="/coach" className="hover:text-white text-blue-400 font-medium">
             Career Coach
           </Link>
