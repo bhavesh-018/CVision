@@ -25,6 +25,10 @@ function Navbar() {
             Resume Chat
           </Link>
 
+          <Link to="/github" className="hover:text-white">
+            GitHub
+          </Link>
+
           <Link to="/coach" className="hover:text-white text-blue-400 font-medium">
             Career Coach
           </Link>

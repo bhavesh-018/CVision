@@ -24,6 +24,8 @@ from app.db.sqlite_manager import SQLiteManager
 from app.rag.knowledge.career_knowledge import load_career_knowledge
 from app.routers import chat
 from app.routers import coach
+from app.routers import github
+from app.routers import jobs
 from app.rag.ingestion.resume_ingester import ingest_resume
 
 @asynccontextmanager
@@ -53,6 +55,8 @@ app.add_middleware(
 
 app.include_router(chat.router)
 app.include_router(coach.router)
+app.include_router(github.router)
+app.include_router(jobs.router)
 
 @app.get("/")
 def home():
