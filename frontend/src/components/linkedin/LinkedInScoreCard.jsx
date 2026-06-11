@@ -1,5 +1,6 @@
 import React from "react";
 import { Globe, Briefcase, Award, GraduationCap, LayoutTemplate } from "lucide-react";
+import ProgressCircle from "../ui/ProgressCircle";
 
 export default function LinkedInScoreCard({ result }) {
   const score = result.linkedin_score;
@@ -9,33 +10,13 @@ export default function LinkedInScoreCard({ result }) {
     if (val >= 80) return "text-green-400";
     if (val >= 60) return "text-yellow-400";
     return "text-red-400";
-  };
-
+  }
   return (
     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl mb-8">
       <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
         {/* Total Score */}
         <div className="flex flex-col items-center justify-center min-w-[200px] shrink-0">
-          <div className="relative flex items-center justify-center w-40 h-40 mb-4">
-            <svg className="absolute inset-0 -rotate-90" width="160" height="160">
-              <circle cx="80" cy="80" r="70" fill="none" stroke="#1e293b" strokeWidth="12" />
-              <circle
-                cx="80" cy="80" r="70"
-                fill="none"
-                stroke={score >= 80 ? "#4ade80" : score >= 60 ? "#facc15" : "#f87171"}
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeDasharray={2 * Math.PI * 70}
-                strokeDashoffset={(2 * Math.PI * 70) - ((score / 100) * (2 * Math.PI * 70))}
-                style={{ transition: "stroke-dashoffset 1.5s ease-out" }}
-              />
-            </svg>
-            <div className="text-center z-10">
-              <div className={`text-4xl font-black ${getScoreColor(score)}`}>{score}</div>
-              <div className="text-sm font-medium text-slate-400 mt-1">/100</div>
-            </div>
-          </div>
-          <h2 className="text-lg font-bold text-white uppercase tracking-widest">Profile Score</h2>
+          <ProgressCircle score={score} size={160} label="Profile Score" />
         </div>
 
         {/* Breakdown */}

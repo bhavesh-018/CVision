@@ -1,5 +1,6 @@
 import React from "react";
 import { GitFork, Users, Globe, MapPin, BookOpen } from "lucide-react";
+import ProgressCircle from "../ui/ProgressCircle";
 
 const LEVEL_COLORS = {
   Expert: "text-purple-400 bg-purple-400/10 border-purple-500/30",
@@ -15,36 +16,6 @@ const SCORE_BREAKDOWN_CONFIG = {
   social_proof: { label: "Social Proof", max: 20, color: "bg-amber-500" },
 };
 
-function CircularScore({ score }) {
-  const radius = 54;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
-
-  const color =
-    score >= 75 ? "#a855f7" : score >= 50 ? "#3b82f6" : score >= 30 ? "#22c55e" : "#f59e0b";
-
-  return (
-    <div className="relative flex items-center justify-center w-36 h-36">
-      <svg className="absolute inset-0 -rotate-90" width="144" height="144">
-        <circle cx="72" cy="72" r={radius} fill="none" stroke="#1e293b" strokeWidth="10" />
-        <circle
-          cx="72" cy="72" r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 1s ease" }}
-        />
-      </svg>
-      <div className="text-center z-10">
-        <div className="text-3xl font-black text-white">{score}</div>
-        <div className="text-xs text-slate-400">/100</div>
-      </div>
-    </div>
-  );
-}
 
 export default function GitHubScoreCard({ result }) {
   const levelClass = LEVEL_COLORS[result.level] || LEVEL_COLORS.Beginner;
@@ -98,8 +69,7 @@ export default function GitHubScoreCard({ result }) {
 
         {/* Score circle */}
         <div className="flex flex-col items-center gap-2">
-          <CircularScore score={result.github_score} />
-          <span className="text-xs text-slate-500 uppercase tracking-widest">GitHub Score</span>
+          <ProgressCircle score={result.github_score} size={144} stroke={10} label="GitHub Score" />
         </div>
       </div>
 
