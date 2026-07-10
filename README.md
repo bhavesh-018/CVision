@@ -1,4 +1,4 @@
-# Resume Analyzer — CVision Career OS
+# Resume Analyzer — CVision
 
 Most resume tools give you a generic score and call it a day. This one actually reads your resume, thinks about it, and tells you things a career coach would.
 
