@@ -91,17 +91,18 @@ resume-analyzer/
 
 ### Dashboard (POST /dashboard)
 
-This is the main endpoint and the one the frontend calls first. You upload your resume and optionally pass a session ID. The backend runs the following in sequence:
+This is the main endpoint and the one the frontend calls first. You upload your resume and can optionally paste a **Job Description (JD)** text. If provided, the backend evaluates your resume directly against that specific JD while also evaluating your overall role readiness across 9 standard tech roles. If no JD is provided, it seamlessly evaluates role readiness across all 9 roles. The backend runs the following in sequence:
 
 1. Parses the PDF and extracts raw text
-2. Extracts skills using keyword matching against a curated list
+2. Extracts skills using keyword matching against a curated dataset
 3. Calculates an ATS score across six categories
-4. Ingests the resume into ChromaDB so the chat system can search it
-5. Evaluates strengths, weaknesses, and suggestions
-6. Analyzes which sections are present (Education, Experience, Projects, etc.)
-7. Benchmarks your resume against typical candidate profiles
-8. Scores your readiness for nine roles simultaneously
-9. Runs a master analysis that produces an AI review, interview questions, and a rewritten version
+4. Matches against the provided Job Description (if uploaded) and computes role readiness across 9 roles
+5. Ingests the resume into ChromaDB so the chat system can search it
+6. Evaluates strengths, weaknesses, and suggestions
+7. Analyzes which sections are present (Education, Experience, Projects, etc.)
+8. Benchmarks your resume against typical candidate profiles
+9. Scores your readiness for nine roles simultaneously
+10. Runs a master analysis that produces an AI review, interview questions (tailored to JD if available), and a rewritten version
 
 Everything comes back in a single JSON response. The frontend renders all of it.
 
@@ -273,9 +274,7 @@ venv\Scripts\activate        # Windows
 source venv/bin/activate     # macOS / Linux
 
 # Install dependencies
-pip install fastapi uvicorn python-dotenv httpx chromadb \
-            google-generativeai beautifulsoup4 pydantic \
-            python-multipart pymupdf sentence-transformers
+pip install -r requirements.txt
 
 # Create the uploads folder if it does not exist
 mkdir uploads
