@@ -5,6 +5,7 @@ import OverviewSection from "../components/dashboard/OverviewSection";
 import TabNavigation from "../components/dashboard/TabNavigation";
 
 import AtsTab from "../components/dashboard/AtsTab";
+import JobMatchTab from "../components/dashboard/JobMatchTab";
 import ReviewTab from "../components/dashboard/ReviewTab";
 import BenchmarkTab from "../components/dashboard/BenchmarkTab";
 import ReadinessTab from "../components/dashboard/ReadinessTab";
@@ -12,7 +13,6 @@ import InterviewTab from "../components/dashboard/InterviewTab";
 import RewriteTab from "../components/dashboard/RewriteTab";
 import Navbar from "../components/Navbar";
 import UploadCard from "../components/UploadCard";
-
 
 function Dashboard() {
   const [analysis, setAnalysis] = useState(null);
@@ -22,15 +22,23 @@ function Dashboard() {
     const storedData = localStorage.getItem("analysis");
 
     if (storedData) {
-      setAnalysis(JSON.parse(storedData));
+      try {
+        const parsed = JSON.parse(storedData);
+        setAnalysis(parsed);
+        if (parsed.job_match) {
+          setActiveTab("job_match");
+        }
+      } catch (e) {
+        console.error("Error parsing analysis data", e);
+      }
     }
   }, []);
 
   if (!analysis) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex-col">
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center p-6">
           <UploadCard />
         </div>
       </div>
@@ -59,6 +67,9 @@ function Dashboard() {
     analysis.readiness || {};
 
   const tabs = [
+    ...(analysis.job_match
+      ? [{ id: "job_match", label: "Target JD Match" }]
+      : []),
     {
       id: "ats",
       label: "ATS Analysis",
@@ -101,19 +112,22 @@ function Dashboard() {
           skills={skills}
           strengths={strengths}
           weaknesses={weaknesses}
+          jobMatch={analysis.job_match}
+          onNavigateToJdMatch={() => setActiveTab("job_match")}
         />
 
         <div className="mt-10">
-
           <TabNavigation
             tabs={tabs}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />
-
         </div>
 
         <div className="mt-8">
+          {activeTab === "job_match" && (
+            <JobMatchTab analysis={analysis} />
+          )}
 
           {activeTab === "ats" && (
             <AtsTab analysis={analysis} />
@@ -138,11 +152,9 @@ function Dashboard() {
           {activeTab === "rewrite" && (
             <RewriteTab analysis={analysis} />
           )}
-
         </div>
 
       </div>
-
     </div>
   );
 }

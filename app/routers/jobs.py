@@ -67,32 +67,57 @@ async def search_jobs(request: JobSearchRequest):
                 resume_text=request.resume_text
             )
             
-            advice = await generate_application_advice(
-                job=job,
-                match_data=match,
-                candidate_skills=request.skills
-            )
-            
             scored_jobs.append({
                 **job,
                 "match_score": match["match_score"],
                 "matching_skills": match["matching_skills"],
                 "missing_skills": match["missing_skills"],
                 "critical_gaps": match["critical_gaps"],
-                "application_advice": advice
+                "application_advice": ""
             })
             
         scored_jobs.sort(key=lambda j: j["match_score"], reverse=True)
+        display_jobs = scored_jobs[:request.limit]
+        
+        for j in display_jobs:
+            score = j["match_score"]
+            have = ", ".join(j["matching_skills"][:3]) if j["matching_skills"] else "core skills"
+            missing = ", ".join(j["missing_skills"][:2]) if j["missing_skills"] else ""
+            
+            if score >= 75:
+                j["application_advice"] = f"Strong match ({score}%)! Your experience with {have} makes you a standout candidate. Emphasize impact metrics and project outcomes with these tools in your cover letter."
+            elif score >= 50:
+                gap_note = f" Highlight any adjacent experience or side projects covering {missing}." if missing else ""
+                j["application_advice"] = f"Good match ({score}%). Your foundation in {have} is relevant.{gap_note} Frame your background around problem-solving versatility."
+            else:
+                j["application_advice"] = f"Moderate fit ({score}%). To stand out, showcase practical projects demonstrating quick adaptation to {missing or 'the required tech stack'}."
+        
+        # For the #1 top match, try to add a personalized Gemini coach tip if available
+        if display_jobs and request.skills:
+            try:
+                import asyncio
+                top_job = display_jobs[0]
+                ai_advice = await asyncio.wait_for(
+                    generate_application_advice(top_job, top_job, request.skills),
+                    timeout=3.0
+                )
+                if ai_advice and len(ai_advice.strip()) > 20 and not ai_advice.startswith("I encountered an error"):
+                    top_job["application_advice"] = ai_advice.strip()
+            except Exception:
+                pass
         
         if request.session_id:
-            for job in scored_jobs[:3]:
-                await save_job_to_chroma(job, request.session_id)
+            for job in display_jobs[:3]:
+                try:
+                    await save_job_to_chroma(job, request.session_id)
+                except Exception:
+                    pass
                 
-        top_matches = [j for j in scored_jobs if j["match_score"] >= 60]
+        top_matches = [j for j in display_jobs if j["match_score"] >= 60]
         
         return JobSearchResponse(
-            jobs=scored_jobs[:request.limit],
-            total_found=len(scored_jobs),
+            jobs=display_jobs,
+            total_found=len(display_jobs),
             search_query=f"{request.role} in {request.location}",
             top_matches=top_matches[:3]
         )

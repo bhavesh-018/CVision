@@ -104,16 +104,15 @@ export default function Home() {
               Powered by Gemini 2.5 Flash
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6">
-              Your AI-Powered
-              <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-                Career Operating System
-              </span>
+            <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight mb-6 whitespace-nowrap">
+              <span className="bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent">Analyze.</span>{" "}
+              <span className="bg-gradient-to-r from-purple-400 to-violet-300 bg-clip-text text-transparent">Match.</span>{" "}
+              <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">Accelerate.</span>
             </h1>
 
             <p className="text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto mb-12">
-              Resume analysis, GitHub intelligence, LinkedIn alignment, job matching,
-              and a 24/7 AI career coach — all in one platform.
+              CVision turns your resume into intelligence — scoring job fits, analyzing
+              your GitHub, aligning your LinkedIn, and coaching your career, all in one place.
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center">

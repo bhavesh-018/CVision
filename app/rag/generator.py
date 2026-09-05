@@ -16,8 +16,10 @@ async def generate_rag_response(
         "max_output_tokens": max_tokens,
     }
     
+    import asyncio
     try:
-        response = model.generate_content(
+        response = await asyncio.to_thread(
+            model.generate_content,
             prompt,
             generation_config=generation_config
         )

@@ -278,7 +278,8 @@ async def resume_benchmark(
 @app.post("/dashboard")
 async def dashboard(
     file: UploadFile = File(...),
-    session_id: str = Form(None)
+    session_id: str = Form(None),
+    job_description: str = Form(None)
 ):
     try:
 
@@ -299,11 +300,20 @@ async def dashboard(
             resume_text
         )
 
-        # ATS Analysis
+        # Job Description Match (if provided)
+        job_match = None
+        if job_description and len(job_description.strip()) > 10:
+            job_match = match_job_description(
+                resume_text=resume_text,
+                job_description=job_description,
+                candidate_skills=skills
+            )
 
+        # ATS Analysis (incorporates JD alignment if provided)
         ats = calculate_ats_score(
-            resume_text,
-            skills
+            text=resume_text,
+            skills=skills,
+            job_description=job_description if job_match else None
         )
         
         # Ingest to ChromaDB for Chat/Coach
@@ -336,7 +346,7 @@ async def dashboard(
             sections=sections["sections"]
         )
 
-        # Role Readiness
+        # Role Readiness (ALWAYS evaluated across all 9 target roles)
 
         role_readiness = {
             "Backend Engineer":
@@ -393,7 +403,7 @@ async def dashboard(
                 )
         }
 
-        # Resume Rewriting
+        # Resume Rewriting & Master Analysis
 
         ai_analysis = master_analysis(
             resume_text
@@ -407,8 +417,12 @@ async def dashboard(
 
             "ats": {
                 "score": ats["score"],
-                "breakdown": ats["breakdown"]
+                "grade": ats.get("grade", "B (Good Foundation)"),
+                "breakdown": ats["breakdown"],
+                "suggestions": ats.get("suggestions", [])
             },
+
+            "job_match": job_match,
 
             "evaluation": {
                 "strengths": evaluation["strengths"],

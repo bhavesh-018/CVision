@@ -1,5 +1,7 @@
 import httpx
 import os
+from dotenv import load_dotenv
+load_dotenv()
 from app.services.jd_matcher import match_job_description
 from app.rag.generator import generate_rag_response
 
@@ -13,29 +15,84 @@ async def search_jobs_adzuna(
     country: str = "us",
     limit: int = 10
 ) -> list[dict]:
-    if not ADZUNA_APP_ID:
+    app_id = os.getenv("ADZUNA_APP_ID", "") or ADZUNA_APP_ID
+    app_key = os.getenv("ADZUNA_API_KEY", "") or ADZUNA_API_KEY
+    if not app_id or not app_key:
         return get_mock_jobs(role, location, limit)
     
+    loc_clean = (location or "").strip()
+    what_query = role.strip()
+    where_query = None
+    target_country = country.lower()
+
+    # If location is remote / work from home, don't pass as geographic 'where'
+    if loc_clean.lower() in ["remote", "wfh", "work from home"]:
+        if "remote" not in what_query.lower():
+            what_query = f"{what_query} remote"
+    elif loc_clean:
+        # If user specified something like "New York / Remote", pass New York to where
+        cleaned_loc = loc_clean
+        for term in ["remote", "wfh", "work from home"]:
+            cleaned_loc = cleaned_loc.replace(term, "").replace("/", "").strip()
+        if cleaned_loc:
+            where_query = cleaned_loc
+            if "remote" in loc_clean.lower() and "remote" not in what_query.lower():
+                what_query = f"{what_query} remote"
+        else:
+            if "remote" not in what_query.lower():
+                what_query = f"{what_query} remote"
+
+    # Auto-detect country based on common locations if default 'us'
+    loc_lower = loc_clean.lower()
+    if any(k in loc_lower for k in ["india", "bangalore", "bengaluru", "mumbai", "delhi", "pune", "hyderabad", "noida", "gurgaon", "chennai"]):
+        target_country = "in"
+    elif any(k in loc_lower for k in ["uk", "united kingdom", "london", "manchester", "birmingham"]):
+        target_country = "gb"
+    elif any(k in loc_lower for k in ["canada", "toronto", "vancouver", "montreal"]):
+        target_country = "ca"
+    elif any(k in loc_lower for k in ["australia", "sydney", "melbourne", "brisbane"]):
+        target_country = "au"
+
     params = {
-        "app_id": ADZUNA_APP_ID,
-        "app_key": ADZUNA_API_KEY,
+        "app_id": app_id,
+        "app_key": app_key,
         "results_per_page": limit,
-        "what": role,
-        "where": location,
+        "what": what_query,
         "content-type": "application/json"
     }
+    if where_query:
+        params["where"] = where_query
     
-    async with httpx.AsyncClient(timeout=10) as client:
-        response = await client.get(
-            f"{ADZUNA_BASE}/{country}/search/1",
-            params=params
-        )
-        
-        if response.status_code != 200:
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.get(
+                f"{ADZUNA_BASE}/{target_country}/search/1",
+                params=params
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                results = data.get("results", [])
+                
+                # If zero results with a specific 'where' location, try fallback without 'where'
+                if not results and where_query:
+                    params_fallback = {**params}
+                    params_fallback.pop("where", None)
+                    fallback_resp = await client.get(
+                        f"{ADZUNA_BASE}/{target_country}/search/1",
+                        params=params_fallback
+                    )
+                    if fallback_resp.status_code == 200:
+                        results = fallback_resp.json().get("results", [])
+                
+                if results:
+                    return [format_adzuna_job(job) for job in results]
+                    
+            # If Adzuna returned 0 results or non-200, fallback to mock jobs
             return get_mock_jobs(role, location, limit)
-        
-        data = response.json()
-        return [format_adzuna_job(job) for job in data.get("results", [])]
+    except Exception as e:
+        print(f"Adzuna API search error: {e}")
+        return get_mock_jobs(role, location, limit)
 
 def format_adzuna_job(job: dict) -> dict:
     return {
@@ -168,16 +225,42 @@ async def score_job_match(
     candidate_skills: list[str],
     resume_text: str = ""
 ) -> dict:
+    combined_resume = f"{resume_text} {' '.join(candidate_skills)}".strip()
     match_result = match_job_description(
-        resume_text or " ".join(candidate_skills),
+        combined_resume,
         job["description"]
     )
     
+    score = match_result["match_score"]
+    matching_skills = list(match_result["matching_skills"])
+    missing_skills = list(match_result["missing_skills"])
+
+    # If jd_matcher didn't find specific skills from strict skill list, check candidate_skills in JD text
+    desc_lower = job.get("description", "").lower()
+    title_lower = job.get("title", "").lower()
+    for s in candidate_skills:
+        s_clean = s.strip().lower()
+        if len(s_clean) > 2 and (s_clean in desc_lower or s_clean in title_lower):
+            if s_clean not in [m.lower() for m in matching_skills]:
+                matching_skills.append(s)
+
+    # Base score adjustment based on title relevance and identified skill overlap
+    if score == 0 and matching_skills:
+        score = min(len(matching_skills) * 20, 85)
+    elif score == 0:
+        # Check title overlap
+        title_words = [w for w in title_lower.split() if len(w) > 3]
+        overlap = sum(1 for w in title_words if w in combined_resume.lower())
+        if overlap > 0:
+            score = min(30 + overlap * 15, 75)
+        else:
+            score = 35
+
     return {
-        "match_score": match_result["match_score"],
-        "matching_skills": match_result["matching_skills"],
-        "missing_skills": match_result["missing_skills"],
-        "critical_gaps": match_result["critical_missing_skills"]
+        "match_score": min(score, 98),
+        "matching_skills": matching_skills,
+        "missing_skills": missing_skills,
+        "critical_gaps": match_result.get("critical_missing_skills", [])
     }
 
 async def generate_application_advice(
