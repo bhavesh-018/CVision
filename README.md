@@ -1,4 +1,4 @@
-# Resume Analyzer — CVision Career OS
+# Resume Analyzer — CVision
 
 Most resume tools give you a generic score and call it a day. This one actually reads your resume, thinks about it, and tells you things a career coach would.
 
@@ -8,9 +8,9 @@ Upload your PDF. Get back an ATS score, section-by-section feedback, a rewritten
 
 ## What This Is
 
-CVision Career OS is a full-stack AI career tool built with FastAPI on the backend and React (Vite) on the frontend. The backend uses Google Gemini as its language model, ChromaDB as a vector store for RAG, and SQLite for persistent session and chat history. The frontend communicates with the backend over a REST API and renders all analysis results in a single-page dashboard.
+CVision is a full-stack AI career tool built with FastAPI on the backend and React (Vite) on the frontend. The backend uses Google Gemini as its language model, ChromaDB as a vector store for RAG, and SQLite for persistent session and chat history. The frontend communicates with the backend over a REST API and renders all analysis results in a single-page dashboard.
 
-The name "Career OS" is intentional. This is not just a resume checker. It is a system that takes your resume as its central input and branches out into every career-related question you might have — from "am I ready for this role" to "what should I say in my cover letter."
+The name 'CVision' is intentional. This is not just a resume checker. It is a system that takes your resume as its central input and branches out into every career-related question you might have — from "am I ready for this role" to "what should I say in my cover letter."
 
 ---
 
